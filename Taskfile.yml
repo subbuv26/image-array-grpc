@@ -1,0 +1,24 @@
+version: '3'
+
+vars:
+  SERVER_APP: image_server
+  REGISTRY: ""
+  REPOSITORY: "subbuv26"
+  TAG: latest
+  PROTODIR: helloworld
+
+includes:
+  server:
+    taskfile: ./image_server
+    dir: ./image_server
+
+tasks:
+  proto-buf-gen:
+    desc: "[Re]Generate go code for protocol buffers."
+    cmds:
+      # - protoc -I {{.PROTODIR}} --go_out=paths=source_relative:{{.PROTODIR}} --go-grpc_out=paths=source_relative:{{.PROTODIR}} helloworld.proto
+      - buf generate
+  build-container:
+    desc: Builds and pushes this example's containers.
+    cmds:
+      - task: server:buildx-container

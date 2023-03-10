@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+option go_package = "github.com/subbuv26/image-array-grpc/proto/image";
+
+package image;
+
+message Image {
+	string url = 1;
+	string name = 2;
+	int32 size = 3;
+}
+
+// Generated according to https://cloud.google.com/apis/design/standard_methods
+service ImageService {
+	rpc ListImages(ListImagesRequest) returns (ListImagesResponse) {}
+
+	rpc GetImage(GetImageRequest) returns (Image) {}
+
+	rpc CreateImage(CreateImageRequest) returns (CreateImageResponse) {}
+
+	rpc UpdateImage(UpdateImageRequest) returns (StatusResponse) {}
+
+	rpc DeleteImage(DeleteImageRequest) returns (StatusResponse) {}
+}
+
+// message Image {
+// ! This should be defined elsewere
+// }
+
+message EmptyResponse {}
+
+message ListImagesRequest {
+	int32 maxImages = 1;
+}
+
+message ListImagesResponse {
+	repeated Image Images = 1;
+}
+
+message GetImageRequest {
+	string id = 1;
+}
+
+message CreateImageRequest {
+	Image Image = 1;
+}
+
+message CreateImageResponse {
+	string id = 1;
+}
+
+
+message StatusResponse {
+	bool success = 1;
+}
+
+message UpdateImageRequest {
+	Image Image = 1;
+}
+
+message DeleteImageRequest {
+	string id = 1;
+}
