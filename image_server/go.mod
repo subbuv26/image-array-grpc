@@ -6,6 +6,7 @@ go 1.18
 
 require (
 	github.com/google/uuid v1.3.0
+	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/subbuv26/image-array-grpc/proto/image v0.0.0-00010101000000-000000000000
 	google.golang.org/grpc v1.53.0
 )

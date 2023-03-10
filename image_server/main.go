@@ -21,6 +21,7 @@ package main
 
 import (
 	"context"
+	grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
 	"log"
 	"net"
 
@@ -32,6 +33,9 @@ import (
 	grpcCodes "google.golang.org/grpc/codes"
 	"google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
+
+	grpcMiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	grpcAuth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
 )
 
 const (
@@ -123,10 +127,24 @@ func main() {
 	store = imageStore{
 		images: make(map[string]*pb.Image),
 	}
-	s := grpc.NewServer()
+	s := grpc.NewServer(
+		grpc.UnaryInterceptor(grpcMiddleware.ChainUnaryServer(
+			grpcAuth.UnaryServerInterceptor(AuthFunc),
+		)))
 	pb.RegisterImageServiceServer(s, &imageServer{})
 	grpc_health_v1.RegisterHealthServer(s, health.NewServer())
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
+}
+
+// AuthFunc is a middleware (interceptor) that extracts token from header
+func AuthFunc(ctx context.Context) (context.Context, error) {
+	token, err := grpc_auth.AuthFromMD(ctx, "Bearer")
+	if err != nil {
+		return nil, err
+	}
+	log.Printf("Token: %v", token)
+
+	return ctx, nil
 }
